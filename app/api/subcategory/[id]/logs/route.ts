@@ -6,12 +6,12 @@ import Category from '@/models/Category';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
 
-    const { id } = params;
+    const { id } = await params;
 
     // Get subcategory details
     const subcategory = await SubCategory.findById(id).populate('category');
