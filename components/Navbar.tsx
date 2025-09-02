@@ -88,7 +88,7 @@ export default function Navbar() {
                       {categories.map((category) => (
                         <Link
                           key={category._id}
-                          href={`/products/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                          href={`/products/category/${category._id}`}
                           className="block px-4 py-2 text-base text-primary-foreground hover:bg-primary/80 transition-colors"
                           onClick={() => setIsCategoriesOpen(false)}
                         >

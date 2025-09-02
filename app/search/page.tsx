@@ -26,6 +26,7 @@ interface SearchResults {
   data: Category[];
   query: string;
   totalResults: number;
+  error?: string;
 }
 
 export default function SearchPage() {
@@ -54,7 +55,7 @@ export default function SearchPage() {
       if (result.success) {
         setSearchResults(result.data);
       } else {
-        setError(result.error || 'Search failed');
+        setError(result?.error || 'Search failed');
       }
     } catch (err) {
       setError('Error performing search');

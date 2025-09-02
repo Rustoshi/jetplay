@@ -146,7 +146,7 @@ export default function HeroSection() {
               {categories.map((category, index) => (
                 <span key={category._id} className="flex items-center">
                   <Link 
-                    href={`/products?category=${encodeURIComponent(category.name)}`}
+                    href={`/products/category/${category._id}`}
                     className="hover:text-primary transition-colors cursor-pointer"
                   >
                     {category.name}

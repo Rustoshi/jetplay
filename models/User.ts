@@ -12,7 +12,9 @@ const UserSchema = new Schema({
     password: {type: String, required: true},
     role: {type: String, enum: ["user", "admin"], default: "user"},
     balance: {type: Number, required: false, default: 0},
-    spent: {type: Number, required: false, default: 0}
+    spent: {type: Number, required: false, default: 0},
+    resetPasswordToken: {type: String, required: false},
+    resetPasswordExpires: {type: Date, required: false}
 }, {
     timestamps: true
 });

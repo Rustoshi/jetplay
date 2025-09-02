@@ -40,11 +40,6 @@ export default function AddSubCategoryPage() {
     return null;
   }
 
-  // Fetch categories on component mount
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
@@ -62,6 +57,11 @@ export default function AddSubCategoryPage() {
       setLoadingCategories(false);
     }
   };
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

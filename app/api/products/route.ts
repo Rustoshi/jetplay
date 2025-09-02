@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/utils/mongodb';
 import Category from '@/models/Category';
 import SubCategory from '@/models/SubCategory';
-import UserLog from '@/models/Log';
+import Log from '@/models/Log';
 
 export async function GET() {
   try {
@@ -23,7 +23,7 @@ export async function GET() {
         // For each subcategory, get the count of unsold logs
         const subcategoriesWithCounts = await Promise.all(
           subcategories.map(async (subcategory) => {
-            const unsoldCount = await UserLog.countDocuments({
+            const unsoldCount = await Log.countDocuments({
               subCategory: subcategory._id,
               sold: false
             });

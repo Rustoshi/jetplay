@@ -11,10 +11,30 @@ interface AdminStats {
   totalTransactions: number;
 }
 
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  balance: number;
+  spent: number;
+  createdAt: string;
+}
+
+interface Log {
+  _id: string;
+  user: User;
+  category: { name: string };
+  subCategory: { name: string };
+  price: number;
+  createdAt: string;
+}
+
 interface AdminData {
   stats: AdminStats;
-  users: any[];
-  logs: any[];
+  users: User[];
+  logs: Log[];
 }
 
 export default function AdminDashboard() {
