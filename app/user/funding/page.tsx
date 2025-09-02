@@ -7,7 +7,7 @@ import { MessageCircle } from 'lucide-react';
 export default function FundingPage() {
   const handleWhatsAppContact = () => {
     // Replace with your actual WhatsApp business number
-    const whatsappNumber = '+1234567890'; // Update this with your actual number
+    const whatsappNumber = '+2348139113344'; // Update this with your actual number
     const message = encodeURIComponent('Hello, I would like to fund my Jetplay account. Please assist me with the process.');
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
   };

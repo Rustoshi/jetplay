@@ -190,14 +190,8 @@ export default function Dashboard() {
       description: 'Learn how to add funds to your account'
     },
     {
-      title: 'How to Buy Logs',
-      href: '/user/guide',
-      icon: BookOpen,
-      description: 'Step-by-step guide to purchasing'
-    },
-    {
       title: 'Join Our WhatsApp Channel',
-      href: 'https://whatsapp.com/channel/jetplay',
+      href: 'https://whatsapp.com/channel/0029VbAckKz7j6fxvuPBAM0J',
       icon: MessageCircle,
       description: 'Get updates and support',
       external: true

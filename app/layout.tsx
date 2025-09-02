@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
+import WhatsAppButton from "../components/WhatsAppButton";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,6 +27,7 @@ export default function RootLayout({
       >
         <SessionProvider>
           {children}
+          <WhatsAppButton />
         </SessionProvider>
       </body>
     </html>
