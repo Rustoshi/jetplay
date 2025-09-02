@@ -23,23 +23,6 @@ export default function AddSubCategoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Redirect if not authenticated or not admin
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session?.user || session.user.role !== 'admin') {
-    router.push('/');
-    return null;
-  }
-
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
@@ -62,6 +45,23 @@ export default function AddSubCategoryPage() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Redirect if not authenticated or not admin
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session?.user || session.user.role !== 'admin') {
+    router.push('/');
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
