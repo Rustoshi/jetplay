@@ -13,7 +13,9 @@ import {
   AlertTriangle,
   DollarSign,
   FileText,
-  FolderOpen
+  FolderOpen,
+  Image,
+  Edit
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import Link from 'next/link';
@@ -28,7 +30,10 @@ interface SubCategoryData {
   name: string;
   description: string;
   price: number;
-  category: CategoryData;
+  category: {
+    _id: string;
+    name: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -59,7 +64,7 @@ export default function EditSubCategoryPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price: 0,
+    price: '',
     category: ''
   });
 
@@ -87,7 +92,7 @@ export default function EditSubCategoryPage() {
       setFormData({
         name: subcategoryData.name,
         description: subcategoryData.description,
-        price: subcategoryData.price,
+        price: subcategoryData.price.toString(),
         category: subcategoryData.category._id
       });
     } catch (error: any) {
@@ -129,7 +134,7 @@ export default function EditSubCategoryPage() {
       newErrors.description = 'Description must be at least 10 characters long';
     }
 
-    if (!formData.price || formData.price <= 0) {
+    if (!formData.price || parseFloat(formData.price) <= 0) {
       newErrors.price = 'Price must be greater than 0';
     }
 
@@ -503,6 +508,7 @@ export default function EditSubCategoryPage() {
                     Current price: {formatCurrency(subcategory?.price || 0)}
                   </p>
                 </div>
+
 
                 {/* Submit Button */}
                 <div className="flex justify-end space-x-4 pt-6 border-t">

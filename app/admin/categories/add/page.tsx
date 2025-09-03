@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { FolderOpen, ArrowLeft, Plus } from 'lucide-react';
+import { FolderOpen, ArrowLeft, Plus, Image } from 'lucide-react';
 
 export default function AddCategoryPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [name, setName] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -49,7 +50,8 @@ export default function AddCategoryPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: name.trim()
+          name: name.trim(),
+          logoUrl: logoUrl.trim() || undefined
         }),
       });
 
@@ -61,6 +63,7 @@ export default function AddCategoryPage() {
 
       setSuccess(true);
       setName('');
+      setLogoUrl('');
       
       // Redirect to categories page after success
       setTimeout(() => {
@@ -114,6 +117,29 @@ export default function AddCategoryPage() {
               </div>
               <p className="mt-1 text-sm text-gray-500">
                 Choose a descriptive name for the social media platform or account type
+              </p>
+            </div>
+
+            {/* Logo URL */}
+            <div>
+              <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                Logo URL
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Image className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="url"
+                  id="logoUrl"
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  placeholder="Enter logo URL (optional)"
+                />
+              </div>
+              <p className="mt-1 text-sm text-gray-500">
+                Optional URL to the category logo image
               </p>
             </div>
 

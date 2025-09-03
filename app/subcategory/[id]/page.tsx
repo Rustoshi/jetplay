@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Navbar from '@/components/Navbar';
@@ -10,6 +11,7 @@ import Navbar from '@/components/Navbar';
 interface Log {
   _id: string;
   previewLink: string | null;
+  logoUrl?: string;
   price: number;
   createdAt: string;
 }
@@ -17,6 +19,7 @@ interface Log {
 interface Subcategory {
   _id: string;
   name: string;
+  logoUrl?: string;
   price: number;
   category: {
     _id: string;
@@ -167,16 +170,41 @@ export default function SubcategoryPage() {
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {data.subcategory.name}
-              </h1>
-              <p className="text-gray-600 mb-2">
-                Category: {data.subcategory.category.name}
-              </p>
-              <p className="text-lg font-semibold text-primary">
-                Price: ₦{data.subcategory.price.toLocaleString()} each
-              </p>
+            <div className="flex items-start space-x-4">
+              {/* Subcategory Logo */}
+              <div className="flex-shrink-0">
+                {data.subcategory.logoUrl ? (
+                  <Image
+                    src={data.subcategory.logoUrl}
+                    alt={`${data.subcategory.name} logo`}
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <svg className="w-7 h-7 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  {data.subcategory.name}
+                </h1>
+                <p className="text-gray-600 mb-2">
+                  Category: {data.subcategory.category.name}
+                </p>
+                <p className="text-lg font-semibold text-primary">
+                  Price: ₦{data.subcategory.price.toLocaleString()} each
+                </p>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Available Accounts</p>
@@ -196,29 +224,54 @@ export default function SubcategoryPage() {
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-center">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4">
-                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
-                        Account #{index + 1}
-                      </span>
-                      <span className="text-sm text-gray-600">
-                        {data.subcategory.name}
-                      </span>
-                    </div>
-                    <div className="mt-2 flex items-center space-x-4">
-                      <span className="text-lg font-bold text-primary">
-                        ₦{data.subcategory.price.toLocaleString()}
-                      </span>
-                      {log.previewLink && (
-                        <a 
-                          href={log.previewLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm underline"
-                        >
-                          Preview Link
-                        </a>
+                  <div className="flex-1 flex items-start space-x-3">
+                    {/* Log Logo */}
+                    <div className="flex-shrink-0 mt-1">
+                      {(log.logoUrl || data.subcategory.logoUrl) ? (
+                        <Image
+                          src={log.logoUrl || data.subcategory.logoUrl!}
+                          alt={`${data.subcategory.name} logo`}
+                          width={32}
+                          height={32}
+                          className="rounded-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                          </svg>
+                        </div>
                       )}
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-4">
+                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+                          Account #{index + 1}
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          {data.subcategory.name}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex items-center space-x-4">
+                        <span className="text-lg font-bold text-primary">
+                          ₦{data.subcategory.price.toLocaleString()}
+                        </span>
+                        {log.previewLink && (
+                          <a 
+                            href={log.previewLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 text-sm underline"
+                          >
+                            Preview Link
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <button 

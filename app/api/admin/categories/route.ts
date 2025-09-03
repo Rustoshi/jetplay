@@ -61,11 +61,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request body
-    const { name } = await request.json();
+    const { name, logoUrl } = await request.json();
 
     // Validate required fields
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
+    }
+
+    // Validate logoUrl if provided
+    if (logoUrl && (typeof logoUrl !== 'string' || logoUrl.trim().length === 0)) {
+      return NextResponse.json({ error: 'Logo URL must be a valid string' }, { status: 400 });
     }
 
     // Check if category already exists
@@ -75,9 +80,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new category
-    const category = new Category({
+    const categoryData: any = {
       name: name.trim()
-    });
+    };
+
+    // Add logoUrl if provided
+    if (logoUrl && logoUrl.trim()) {
+      categoryData.logoUrl = logoUrl.trim();
+    }
+
+    const category = new Category(categoryData);
 
     await category.save();
 

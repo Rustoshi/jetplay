@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request body
-    const { name, description, price, category } = await request.json();
+    const body = await request.json();
+    const { name, description, price, category } = body;
 
     // Validate required fields
     if (!name || typeof name !== 'string' || name.trim().length === 0) {

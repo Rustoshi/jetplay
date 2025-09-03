@@ -10,7 +10,8 @@ import {
   Loader2,
   ArrowLeft,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Image
 } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import Link from 'next/link';
@@ -18,6 +19,7 @@ import Link from 'next/link';
 interface CategoryData {
   id: string;
   name: string;
+  logoUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,7 +47,8 @@ export default function EditCategoryPage() {
   const [deleting, setDeleting] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: ''
+    name: '',
+    logoUrl: ''
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -69,7 +72,8 @@ export default function EditCategoryPage() {
       const categoryData = data.data.category;
       setCategory(categoryData);
       setFormData({
-        name: categoryData.name
+        name: categoryData.name,
+        logoUrl: categoryData.logoUrl || ''
       });
     } catch (error: any) {
       setResult({
@@ -342,6 +346,30 @@ export default function EditCategoryPage() {
                   )}
                   <p className="mt-2 text-sm text-gray-500">
                     Category name must be unique and at least 2 characters long
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                    Logo URL
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Image className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="url"
+                      id="logoUrl"
+                      name="logoUrl"
+                      value={formData.logoUrl}
+                      onChange={handleInputChange}
+                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter logo URL (optional)"
+                      disabled={saving}
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Optional URL to the category logo image
                   </p>
                 </div>
 

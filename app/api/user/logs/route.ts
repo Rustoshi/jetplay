@@ -81,14 +81,16 @@ export async function GET() {
         purchaseDate: log.createdAt,
         subcategory: subcategoryData ? {
           _id: subcategoryData._id,
-          name: subcategoryData.name
+          name: subcategoryData.name,
+          logoUrl: subcategoryData.logoUrl
         } : {
           _id: 'unknown',
           name: 'Unknown Subcategory'
         },
         category: categoryData ? {
           _id: categoryData._id,
-          name: categoryData.name
+          name: categoryData.name,
+          logoUrl: categoryData.logoUrl
         } : {
           _id: 'unknown',
           name: 'Unknown Category'

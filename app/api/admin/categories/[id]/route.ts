@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/utils/mongodb';
 import User from '@/models/User';
 import Category from '@/models/Category';
+import SubCategory from '@/models/SubCategory';
 
 // GET - Fetch category by ID
 export async function GET(
@@ -49,6 +50,7 @@ export async function GET(
         category: {
           id: category._id,
           name: category.name,
+          logoUrl: category.logoUrl,
           createdAt: category.createdAt,
           updatedAt: category.updatedAt
         }
@@ -91,12 +93,20 @@ export async function PUT(
 
     // Parse request body
     const body = await request.json();
-    const { name } = body;
+    const { name, logoUrl } = body;
 
     // Validation
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
         { error: 'Category name is required.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate logoUrl if provided
+    if (logoUrl && (typeof logoUrl !== 'string' || logoUrl.trim().length === 0)) {
+      return NextResponse.json(
+        { error: 'Logo URL must be a valid string.' },
         { status: 400 }
       );
     }
@@ -128,12 +138,42 @@ export async function PUT(
       }
     }
 
+    // Prepare update data
+    const updateData: any = {
+      name: name.trim()
+    };
+
+    // Add logoUrl if provided, or remove it if empty
+    if (logoUrl && logoUrl.trim()) {
+      updateData.logoUrl = logoUrl.trim();
+    } else if (logoUrl === '') {
+      updateData.$unset = { logoUrl: 1 };
+    }
+
     // Update category
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
-      { name: name.trim() },
+      updateData,
       { new: true, runValidators: true }
     );
+
+    // If logoUrl was updated, also update all subcategories under this category
+    if (logoUrl !== undefined) {
+      const subcategoryUpdateData: any = {};
+      
+      if (logoUrl && logoUrl.trim()) {
+        // Set the new logoUrl for all subcategories
+        subcategoryUpdateData.logoUrl = logoUrl.trim();
+      } else {
+        // Remove logoUrl from all subcategories if category logoUrl was removed
+        subcategoryUpdateData.$unset = { logoUrl: 1 };
+      }
+
+      await SubCategory.updateMany(
+        { category: id },
+        subcategoryUpdateData
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -142,6 +182,7 @@ export async function PUT(
         category: {
           id: updatedCategory._id,
           name: updatedCategory.name,
+          logoUrl: updatedCategory.logoUrl,
           createdAt: updatedCategory.createdAt,
           updatedAt: updatedCategory.updatedAt
         }

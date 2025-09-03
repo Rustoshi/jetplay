@@ -11,11 +11,13 @@ interface Subcategory {
   name: string;
   price: number;
   unsoldCount: number;
+  logoUrl?: string;
 }
 
 interface Category {
   _id: string;
   name: string;
+  logoUrl?: string;
   subcategories: Subcategory[];
 }
 
@@ -69,7 +71,7 @@ export default function ProductsPage() {
       setLoading(true);
       const response = await fetch('/api/products');
       const result: ProductsData = await response.json();
-      
+      console.log(result);
       if (result.success) {
         setProductsData(result.data);
       } else {
@@ -170,74 +172,6 @@ export default function ProductsPage() {
     <div className="bg-background">
       <Header />
       <Navbar />
-      {/* Carousel */}
-      <div 
-        ref={carouselRef}
-        className="relative w-full max-w-4xl mx-auto h-48 md:h-56 overflow-hidden cursor-grab active:cursor-grabbing rounded-lg"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
-        {/* Carousel Container */}
-        <div 
-          className={`flex w-full h-full ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
-          style={{
-            transform: `translateX(-${currentSlide * 100}%)`
-          }}
-        >
-          {infiniteImages.map((image, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0 relative">
-              <Image
-                src={image}
-                alt={`Banner ${((index - 1 + bannerImages.length) % bannerImages.length) + 1}`}
-                fill
-                className="object-contain"
-                priority={index === 1}
-                quality={90}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Slide Indicators */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {bannerImages.map((_, index) => {
-            const isActive = (currentSlide - 1 + bannerImages.length) % bannerImages.length === index;
-            return (
-              <button
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  isActive
-                    ? 'bg-white scale-125' 
-                    : 'bg-white/50 hover:bg-white/75'
-                }`}
-                onClick={() => {
-                  if (!isTransitioning) {
-                    setIsTransitioning(true);
-                    setCurrentSlide(index + 1); // +1 because we start at index 1
-                  }
-                }}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            );
-          })}
-        </div>
-
-        {/* Progress Bar */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-black/20">
-          <div 
-            className="h-full bg-white transition-all duration-4000 ease-linear"
-            style={{
-              width: `${(((currentSlide - 1 + bannerImages.length) % bannerImages.length) + 1) / bannerImages.length * 100}%`
-            }}
-          />
-        </div>
-      </div>
-
       {/* Disclaimer Section */}
       <section className="py-4 bg-red-50 border-l-4 border-red-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -419,9 +353,32 @@ export default function ProductsPage() {
                 <div key={category._id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                   {/* Category Header */}
                   <div className="bg-gradient-to-r from-primary to-primary/80 px-4 py-3">
-                    <h2 className="text-lg font-bold text-primary-foreground">
-                      {category.name}
-                    </h2>
+                    <div className="flex items-center space-x-3">
+                      {category.logoUrl ? (
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={category.logoUrl}
+                            alt={`${category.name} logo`}
+                            width={32}
+                            height={32}
+                            className="rounded-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex-shrink-0 w-8 h-8 bg-primary-foreground/20 rounded-full flex items-center justify-center">
+                          <svg className="w-5 h-5 text-primary-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                          </svg>
+                        </div>
+                      )}
+                      <h2 className="text-lg font-bold text-primary-foreground">
+                        {category.name}
+                      </h2>
+                    </div>
                   </div>
                   
                   {/* Subcategories */}
@@ -435,22 +392,47 @@ export default function ProductsPage() {
                               className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-200"
                             >
                               <div className="flex justify-between items-center">
-                                <div className="flex-1">
-                                  <h3 className="font-semibold text-gray-900 text-base mb-2">
-                                    {subcategory.name}
-                                  </h3>
-                                  <div className="flex items-center space-x-4 text-sm">
-                                    <span className="text-lg font-bold text-primary">
-                                      ₦{subcategory.price.toLocaleString()}
-                                    </span>
-                                    <span className="text-gray-600">
-                                      • {subcategory.unsoldCount} available
-                                    </span>
+                                <div className="flex-1 flex items-start space-x-3">
+                                  {/* Subcategory Logo (inherited from category) */}
+                                  <div className="flex-shrink-0 mt-1">
+                                    {category.logoUrl ? (
+                                      <Image
+                                        src={category.logoUrl}
+                                        alt={`${subcategory.name} logo`}
+                                        width={24}
+                                        height={24}
+                                        className="rounded-full object-cover"
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.style.display = 'none';
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex-1">
+                                    <h3 className="font-semibold text-gray-900 text-base mb-2">
+                                      {subcategory.name}
+                                    </h3>
+                                    <div className="flex items-center space-x-4 text-sm">
+                                      <span className="text-lg font-bold text-primary">
+                                        ₦{subcategory.price.toLocaleString()}
+                                      </span>
+                                      <span className="text-gray-600">
+                                        • {subcategory.unsoldCount} available
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                                 <Link 
                                   href={`/subcategory/${subcategory._id}`}
-                                  className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium inline-block"
+                                  className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium inline-block ml-4"
                                 >
                                   View Accounts
                                 </Link>

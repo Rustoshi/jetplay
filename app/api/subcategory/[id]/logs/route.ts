@@ -35,12 +35,14 @@ export async function GET(
         subcategory: {
           _id: subcategory._id,
           name: subcategory.name,
+          logoUrl: subcategory.logoUrl,
           price: subcategory.price,
           category: subcategory.category
         },
         logs: logs.map(log => ({
           _id: log._id,
           previewLink: log.previewLink,
+          logoUrl: log.logoUrl,
           price: log.price,
           createdAt: log.createdAt
         }))

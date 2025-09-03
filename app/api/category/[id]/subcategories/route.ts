@@ -39,6 +39,7 @@ export async function GET(
         return {
           _id: subcategory._id,
           name: subcategory.name,
+          logoUrl: subcategory.logoUrl,
           price: subcategory.price,
           unsoldCount
         };

@@ -165,7 +165,7 @@ export async function PUT(
     // Update subcategory
     const updatedSubCategory = await SubCategory.findByIdAndUpdate(
       id,
-      { 
+      {
         name: name.trim(),
         description: description.trim(),
         price: price,
