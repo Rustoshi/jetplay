@@ -12,9 +12,9 @@ export default function FundingPage() {
   const [amountSent, setAmountSent] = useState<string>('');
 
   const paymentDetails = {
-    accountName: 'Enwerem miracle chinedu',
-    bank: 'Palmpay',
-    accountNumber: '8139113344'
+    accountName: 'TrustGod Enwerem',
+    bank: 'Pocketapp',
+    accountNumber: '7315531180'
   };
 
   const handleCopy = async (text: string, field: string) => {
