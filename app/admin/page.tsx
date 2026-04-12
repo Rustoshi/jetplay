@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
-import { Users, FileText, CreditCard, TrendingUp, FolderOpen, Tag, List, Receipt, DollarSign } from 'lucide-react';
+import { Users, FileText, CreditCard, TrendingUp, FolderOpen, Tag, List, Receipt, DollarSign, Settings } from 'lucide-react';
 
 interface AdminStats {
   totalUsers: number;
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Navigation Links */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
           {/* Fund User Link */}
           <a
             href="/admin/fund-user"
@@ -255,6 +255,20 @@ export default function AdminDashboard() {
               </div>
               <h4 className="text-sm font-medium text-gray-900">Transactions</h4>
               <p className="text-xs text-gray-500 mt-1">Manage transactions</p>
+            </div>
+          </a>
+
+          {/* Settings Link */}
+          <a
+            href="/admin/settings"
+            className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200 group"
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-gray-100 p-3 rounded-full mb-3 group-hover:bg-gray-200 transition-colors">
+                <Settings className="h-6 w-6 text-gray-600" />
+              </div>
+              <h4 className="text-sm font-medium text-gray-900">Settings</h4>
+              <p className="text-xs text-gray-500 mt-1">Payment & account</p>
             </div>
           </a>
         </div>

@@ -4,18 +4,35 @@ import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import Navbar from '@/components/Navbar';
 import { MessageCircle, Copy, CheckCircle, CreditCard, AlertCircle, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function FundingPage() {
   const { data: session } = useSession();
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [amountSent, setAmountSent] = useState<string>('');
+  const [paymentDetails, setPaymentDetails] = useState({
+    accountName: '',
+    bank: '',
+    accountNumber: ''
+  });
+  const [loadingDetails, setLoadingDetails] = useState(true);
 
-  const paymentDetails = {
-    accountName: 'TrustGod Enwerem',
-    bank: 'Pocketapp',
-    accountNumber: '7315531180'
-  };
+  useEffect(() => {
+    const fetchPaymentDetails = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.success && data.data) {
+          setPaymentDetails(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch payment details:', err);
+      } finally {
+        setLoadingDetails(false);
+      }
+    };
+    fetchPaymentDetails();
+  }, []);
 
   const handleCopy = async (text: string, field: string) => {
     try {

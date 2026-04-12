@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Shield } from 'lucide-react';
+import { Shield, CreditCard } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 
 export default function AdminSettingsPage() {
@@ -13,6 +13,67 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Payment details state
+  const [accountName, setAccountName] = useState('');
+  const [bank, setBank] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentFetching, setPaymentFetching] = useState(true);
+
+  useEffect(() => {
+    const fetchPaymentDetails = async () => {
+      try {
+        const res = await fetch('/api/admin/settings');
+        const data = await res.json();
+        if (data.success) {
+          setAccountName(data.data.accountName || '');
+          setBank(data.data.bank || '');
+          setAccountNumber(data.data.accountNumber || '');
+        }
+      } catch (err) {
+        console.error('Failed to fetch payment details:', err);
+      } finally {
+        setPaymentFetching(false);
+      }
+    };
+    fetchPaymentDetails();
+  }, []);
+
+  const handlePaymentDetailsUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaymentError(null);
+    setPaymentSuccess(false);
+
+    if (!accountName || !bank || !accountNumber) {
+      setPaymentError('All fields are required');
+      return;
+    }
+
+    setPaymentLoading(true);
+
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountName, bank, accountNumber }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update payment details');
+      }
+
+      setPaymentSuccess(true);
+    } catch (err) {
+      setPaymentError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +136,7 @@ export default function AdminSettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-                <p className="mt-2 text-gray-600">Change your admin password</p>
+                <p className="mt-2 text-gray-600">Manage payment details and admin password</p>
               </div>
             </div>
           </div>
@@ -84,6 +145,114 @@ export default function AdminSettingsPage() {
 
       {/* Main Content */}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Payment Details Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="flex items-center mb-6">
+            <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
+            <h2 className="text-xl font-semibold text-gray-900">Payment Account Details</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-6">
+            These details are displayed on the user funding page. Users will transfer funds to this account.
+          </p>
+
+          {paymentSuccess && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">Payment details updated successfully!</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {paymentError && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-red-800">{paymentError}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {paymentFetching ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <form onSubmit={handlePaymentDetailsUpdate} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Account Name *
+                </label>
+                <input
+                  type="text"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="e.g. John Doe"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Bank Name *
+                </label>
+                <input
+                  type="text"
+                  value={bank}
+                  onChange={(e) => setBank(e.target.value)}
+                  placeholder="e.g. GTBank, Access Bank, Opay"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Account Number *
+                </label>
+                <input
+                  type="text"
+                  value={accountNumber}
+                  onChange={(e) => setAccountNumber(e.target.value)}
+                  placeholder="e.g. 0123456789"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={paymentLoading || !accountName || !bank || !accountNumber}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {paymentLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Payment Details'
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
 
         {/* Success Message */}
         {success && (
